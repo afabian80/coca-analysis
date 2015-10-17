@@ -18,7 +18,7 @@ class Main {
 		Main main = new Main()
 		File cocaDir = new File('coca')
 		def cocaSetMap = [:]
-		def outputDirName = 'out'
+		def outputDirName = 'output'
 
 		cocaDir.eachFileRecurse(FileType.FILES) { cocaFile ->
 			def matcher = (cocaFile.name =~ "basewrd(.*).txt")
@@ -64,10 +64,11 @@ class Main {
 		// Set unknownSet = inputSet.minus(k1Words).minus(k2Words).minus(k3Words).minus(k4Words).minus(k5Words)
 		println "Number of word not in database: $unknownWords ($percentageText %)"
 
+		println "Saving words to $outputDirName directory..."
 		def outputDir = new File(outputDirName)
-		// if(outputDir.exists()) {
-		// 	outputDir.deleteDir()
-		// }
+		if(outputDir.exists()) {
+			outputDir.deleteDir()
+		}
 		outputDir.mkdirs()
 
 		inputKBlocks.each { key, value ->
@@ -75,8 +76,8 @@ class Main {
 			blockFile.text = value.join('\n')
 		}
 
-		println "Unknown words:"
-		println unknownSet
+		def unknownFile = new File(outputDir, "off-the-list.txt")
+		unknownFile.text = unknownSet.join('\n')
 
 	}
 
