@@ -1,5 +1,6 @@
 /**
 * Find bad characters in database: perl -ne 'print "$. $_" if m/[\x80-\xFF]/' coca/basewrd3.txt 
+* Sublime: search for [^\x00-\x7F] regex
 **/
 
 import java.util.Set
@@ -31,20 +32,36 @@ class Main {
 		println "Collecting words from input file..."
 
 		Set inputSet = main.individualWords(inputText)
-		println "Number of words in input: ${inputSet.size()}"
+		Integer inputWords = inputSet.size()
+		println "Number of words in input: $inputWords"
+
+		Double percentageSoFar = 0.0
 
 		def inputKBlocks = [:]
 		cocaSetMap.each { key, value ->
 			inputKBlocks[key] = inputSet.intersect(value)
-			println "Number of k-${key} words: ${inputKBlocks[key].size()}"
+			
+			Integer blockWords = inputKBlocks[key].size()
+			String blockWordsText = sprintf('%8d', blockWords)
+			
+			Double percentage = 100.0 * (double) blockWords / inputWords
+			String percentageText = sprintf('%6.2f', percentage)
+
+			percentageSoFar += percentage
+			String percentageSoFarText = sprintf('%6.2f', percentageSoFar)
+			
+			println "Number of k-${key} words: $blockWordsText ($percentageText %  <-></-> $percentageSoFarText %)"
 		}
 
 		def unknownSet = inputSet
 		inputKBlocks.each { key, value ->
 			unknownSet = unknownSet.minus(inputKBlocks[key])
 		}
+		Integer unknownWords = unknownSet.size()
+		Double percentage = 100.0 * (double) unknownWords / inputWords
+		String percentageText = sprintf('%6.2f', percentage)
 		// Set unknownSet = inputSet.minus(k1Words).minus(k2Words).minus(k3Words).minus(k4Words).minus(k5Words)
-		println "Number of word not in database: ${unknownSet.size()}"
+		println "Number of word not in database: $unknownWords ($percentageText %)"
 
 	}
 
