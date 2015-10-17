@@ -9,6 +9,7 @@ import java.util.regex.Matcher
 
 class Main {
 	static void main(String[] args) {
+		def start = System.currentTimeMillis()
 
 		if(args.length != 1) {
 			println('Usage: <executable> subtitle.srt')
@@ -78,6 +79,10 @@ class Main {
 
 		def unknownFile = new File(outputDir, "off-the-list.txt")
 		unknownFile.text = unknownSet.join('\n')
+
+		def end = System.currentTimeMillis()
+		def duration = end - start
+		println "Execution took $duration ms"
 
 	}
 

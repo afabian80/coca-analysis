@@ -88,11 +88,10 @@ class Main {
 
 	Set individualWords(String text) {
 		groovyx.gpars.GParsPool.withPool {
-			String[] words = text.split(/[^a-zA-Z]/) as List
-			def col = words.collectParallel { (it as String).toLowerCase() }
-			def found = col.findAllParallel { it != '' }
-			def sorted = found.sort()
-			return sorted as Set
+			String[] words = text.split(/[^a-zA-Z]/) as Set
+			def collected = words.collectParallel { (it as String).toLowerCase() }
+			def sorted = collected.sort()
+			return collected
 		}
 	}
 
