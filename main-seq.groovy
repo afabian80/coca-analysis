@@ -50,7 +50,7 @@ class Main {
 			percentageSoFar += percentage
 			String percentageSoFarText = sprintf('%6.2f', percentageSoFar)
 			
-			println "Number of k-${key} words: $blockWordsText ($percentageText %  <-></-> $percentageSoFarText %)"
+			println "Number of k-${key} words: $blockWordsText ($percentageText %  -> $percentageSoFarText %)"
 		}
 
 		def unknownSet = inputSet
