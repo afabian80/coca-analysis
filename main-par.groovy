@@ -1,5 +1,5 @@
 /**
-* Find bad characters in database: perl -ne 'print "$. $_" if m/[\x80-\xFF]/' coca/basewrd3.txt 
+* Find bad characters in database: perl -ne 'print "$. $_" if m/[\x80-\xFF]/' coca/basewrd3.txt
 * Sublime: search for [^\x00-\x7F] regex
 **/
 
@@ -22,12 +22,15 @@ class Main {
 		def cocaSetMap = [:]
 		def outputDirName = 'output'
 
+		print "Processing coca files "
 		cocaDir.eachFileRecurse(FileType.FILES) { cocaFile ->
 			def matcher = (cocaFile.name =~ "basewrd(.*).txt")
 			String actualSet = matcher[0][1]
-			println "Processing coca ${actualSet}-k database..."
+			//println "Processing coca ${actualSet}-k database..."
+			print "."
 			cocaSetMap[actualSet] = main.individualWords(cocaFile.text)
 		}
+		println " done."
 
 		File file = new File(args[0])
 		String inputText = file.text
@@ -43,16 +46,16 @@ class Main {
 		def inputKBlocks = [:]
 		cocaSetMap.each { key, value ->
 			inputKBlocks[key] = inputSet.intersect(value)
-			
+
 			Integer blockWords = inputKBlocks[key].size()
 			String blockWordsText = sprintf('%8d', blockWords)
-			
+
 			Double percentage = 100.0 * (double) blockWords / inputWords
 			String percentageText = sprintf('%6.2f', percentage)
 
 			percentageSoFar += percentage
 			String percentageSoFarText = sprintf('%6.2f', percentageSoFar)
-			
+
 			println "Number of k-${key} words: $blockWordsText ($percentageText %  -> $percentageSoFarText %)"
 		}
 
@@ -63,9 +66,9 @@ class Main {
 		Integer unknownWords = unknownSet.size()
 		Double percentage = 100.0 * (double) unknownWords / inputWords
 		String percentageText = sprintf('%6.2f', percentage)
-		println "Number of word not in database: $unknownWords ($percentageText %)"
+		println "Number of words not in database: $unknownWords ($percentageText %)"
 
-		println "Saving words to $outputDirName directory..."
+		println "Saving words to '$outputDirName' directory..."
 		def outputDir = new File(outputDirName)
 		if(outputDir.exists()) {
 			outputDir.deleteDir()
