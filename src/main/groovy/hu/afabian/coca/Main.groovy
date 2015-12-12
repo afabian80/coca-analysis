@@ -188,7 +188,7 @@ class Main {
 
 	Set combineRedWords() {
 		int from = redBlockStart
-		int to = 29
+		int to = 30
 		println "Combining red words from $from to $to"
 		Set redWords = combineWords(from, to)
 		return redWords.plus(this.unknownSet)
