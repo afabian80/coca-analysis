@@ -1,0 +1,33 @@
+apply plugin: 'groovy'
+apply plugin: 'application'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+mainClassName = 'hu.afabian.coca.Main'
+
+buildscript {
+	repositories {
+		jcenter()
+	}
+	dependencies {
+		classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.2'
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	compile 'org.codehaus.groovy:groovy-all:2.4.5'
+	compile 'org.codehaus.gpars:gpars:1.2.1'
+}
+
+run {
+	args "${projectDir}/src/test/resources/samples/sample3.txt"
+}
+
+jar {
+	manifest {
+		attributes('Main-Class': mainClassName)
+	}
+}
