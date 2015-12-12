@@ -147,7 +147,7 @@ class Main {
 		println "Saving colorized input to '${this.outputDir}' directory..."
 		// WARN: this deleted the output
 		ensureCleanOutputDir(outputDir)
-		def colorizedOutput = new File(outputDir, "colorized.txt")
+		def colorizedOutput = new File(outputDir, "colorized.html")
 		colorizedOutput.text = colorize(inputFile.text)
 	}
 
@@ -155,21 +155,27 @@ class Main {
 		def resultLines = []
 		Set greenWords = combineGreenWords().minus([""] as Set)
 		def greenSize = greenWords.size()
-		println "Found $greenSize green words"
+		println "\nFound $greenSize green words ($greenWords)\n"
+		Set redWords = combineRedWords().minus([""] as Set)
+		def redSize = redWords.size()
+		println "\nFound $redSize red words ($redWords)\n"
+
+		resultLines << "<html><body>"
 		
-		text.eachLine { line ->
+		text.eachLine { line, index ->
 			def lineWords = line.split(/[^a-zA-Z]/)
 			def colorizedLine = line
 			lineWords.each { lineWord ->
-				//println "procesisng '$lineWord'"
 				if(lineWord.toLowerCase() in greenWords) {
-					//println "Coloring '$lineWord'"
-					//println "replacing in '$colorizedLine'"
-					colorizedLine = colorizedLine.replaceAll(/$lineWord/, "<green>${lineWord}</green>")
+					colorizedLine = colorizedLine.replace(lineWord, "<span style=\"background-color:LightGreen\">${lineWord}</span>")
+				}
+				if(lineWord.toLowerCase() in redWords) {
+					colorizedLine = colorizedLine.replace(lineWord, "<span style=\"background-color:DarkSalmon\">${lineWord}</span>")
 				}
 			}
-			resultLines << colorizedLine
+			resultLines << "<p>${colorizedLine}</p>"
 		}
+		resultLines << "</body></html>"
 		return resultLines.join('\n')
 	}
 
@@ -181,19 +187,20 @@ class Main {
 	}
 
 	Set combineRedWords() {
-		return combineWords(redBlockStart)
 		int from = redBlockStart
-		int to = 0
+		int to = 29
 		println "Combining red words from $from to $to"
-		return combineWords(from, to)
+		Set redWords = combineWords(from, to)
+		return redWords.plus(this.unknownSet)
 	}
 
-	Set combineWords(from, to=0) {
-		// def combinedSet = new Set()
-		// (1..from).each {
-		// 	combiinputKiloBlocks[it]
-		// }
-		return inputKiloBlocks['04']
+	Set combineWords(int from, int to=0) {
+		def combinedSet = [] as Set
+		(from..to).each { num ->
+			def numText = sprintf('%02d', num)
+			combinedSet += inputKiloBlocks[numText]
+		}
+		return combinedSet
 	}
 
 }

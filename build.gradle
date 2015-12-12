@@ -24,7 +24,8 @@ dependencies {
 }
 
 run {
-	args(["${projectDir}/src/test/resources/samples/sample3.txt", "4", "5"])
+	args(["${projectDir}/src/test/resources/samples/sample1.txt", "5", "9"])
+	jvmArgs(["-Xmx1024m", "-XX:+UseCompressedStrings"])
 }
 
 jar {
