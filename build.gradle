@@ -20,14 +20,22 @@ repositories {
 dependencies {
 	compile 'org.codehaus.groovy:groovy-all:2.4.5'
 	compile 'org.codehaus.gpars:gpars:1.2.1'
+	testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
 }
 
 run {
-	args "${projectDir}/src/test/resources/samples/sample3.txt"
+	args(["${projectDir}/src/test/resources/samples/sample3.txt", "4", "5"])
 }
 
 jar {
 	manifest {
 		attributes('Main-Class': mainClassName)
+	}
+}
+
+test {
+	testLogging {
+		showStandardStreams = true
+		exceptionFormat = 'full'
 	}
 }

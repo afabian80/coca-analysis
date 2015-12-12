@@ -21,8 +21,13 @@ class Main {
 	private Set unknownSet
 	private Double percentageSoFar
 	private File outputDir
+	private int greenBlockStart
+	private int redBlockStart
 
-	Main() {
+	Main(inputFileName, greenStart, redStart) {
+		this.inputFile = new File(inputFileName)
+		this.greenBlockStart = greenStart
+		this.redBlockStart = redStart
 		this.cocaSetMap = [:]
 		this.inputKiloBlocks = [:]
 		this.outputDirName = 'coca-analysis-output'
@@ -33,25 +38,24 @@ class Main {
 	static void main(String[] args) {
 		def start = System.currentTimeMillis()
 
-		if(args.length != 1) {
-			println('Usage: <executable> subtitle.srt')
+		if(args.length != 3) {
+			println('Usage: <executable> subtitle.srt <green-block-start> <red-block-start>')
 			throw new RuntimeException('Missing arguments!')
 		}
+		String inputFileName = args[0]
+		int greenBlockStart = args[1] as Integer
+		int redBlockStart = args[2] as Integer
 
-		Main main = new Main()
-		main.setInputFile(new File(args[0]))
+		Main main = new Main(inputFileName, greenBlockStart, redBlockStart)
 		main.loadCocaDatabase()
 		main.collectInputWords()
 		main.partitionInputSet()
-		main.saveAnalysisOutput()
+		//main.saveAnalysisOutput()
+		main.saveColorizedInput()
 
 		def end = System.currentTimeMillis()
 		def duration = end - start
 		println "Execution took $duration ms"
-	}
-
-	void setInputFile(inputFile) {
-		this.inputFile = inputFile
 	}
 
 	void loadCocaDatabase() {
@@ -137,6 +141,59 @@ class Main {
 	void writeBlockToFile(key, value) {
 		def blockFile = new File(outputDir, "k-${key}.txt")
 		blockFile.text = value.join('\n')
+	}
+
+	void saveColorizedInput() {
+		println "Saving colorized input to '${this.outputDir}' directory..."
+		// WARN: this deleted the output
+		ensureCleanOutputDir(outputDir)
+		def colorizedOutput = new File(outputDir, "colorized.txt")
+		colorizedOutput.text = colorize(inputFile.text)
+	}
+
+	String colorize(text) {
+		def resultLines = []
+		Set greenWords = combineGreenWords().minus([""] as Set)
+		def greenSize = greenWords.size()
+		println "Found $greenSize green words"
+		
+		text.eachLine { line ->
+			def lineWords = line.split(/[^a-zA-Z]/)
+			def colorizedLine = line
+			lineWords.each { lineWord ->
+				//println "procesisng '$lineWord'"
+				if(lineWord.toLowerCase() in greenWords) {
+					//println "Coloring '$lineWord'"
+					//println "replacing in '$colorizedLine'"
+					colorizedLine = colorizedLine.replaceAll(/$lineWord/, "<green>${lineWord}</green>")
+				}
+			}
+			resultLines << colorizedLine
+		}
+		return resultLines.join('\n')
+	}
+
+	Set combineGreenWords() {
+		int from = greenBlockStart
+		int to = redBlockStart - 1
+		println "Combining green words from $from to $to"
+		return combineWords(from, to)
+	}
+
+	Set combineRedWords() {
+		return combineWords(redBlockStart)
+		int from = redBlockStart
+		int to = 0
+		println "Combining red words from $from to $to"
+		return combineWords(from, to)
+	}
+
+	Set combineWords(from, to=0) {
+		// def combinedSet = new Set()
+		// (1..from).each {
+		// 	combiinputKiloBlocks[it]
+		// }
+		return inputKiloBlocks['04']
 	}
 
 }
